@@ -1,5 +1,6 @@
 import biuoop.GUI;
 import biuoop.DrawSurface;
+import biuoop.Sleeper;
 
 import java.awt.Color;
 
@@ -14,7 +15,7 @@ public class MultipleFramesBouncingBallsAnimation  {
      *@param secondBallsArray is the second sub array.
      *@param size is the size of the original Array.
      */
-    public void createTwoSubBallesArrays(Ball[] originalBallsArray,
+     static void createTwoSubBallsArrays(Ball[] originalBallsArray,
                                          Ball[] firstBallsArray, Ball[] secondBallsArray , int size) {
         for (int i = 0; i < (originalBallsArray.length / 2); i++) {
             firstBallsArray[i] = originalBallsArray [i];
@@ -31,7 +32,7 @@ public class MultipleFramesBouncingBallsAnimation  {
      *@param width is the width of the rectangle.
      *@param heigth is the heigth of the rectangle.
      */
-    public void checkIfBallIsInDomain(Ball[] balls, double startX,
+     static void checkIfBallIsInDomain(Ball[] balls, double startX,
                                       double startY, int width, int heigth) {
         for (int i = 0; i < balls.length; i++) {
             int r = balls[i].getRadius();
@@ -50,75 +51,96 @@ public class MultipleFramesBouncingBallsAnimation  {
         }
 
     }
-    /**
-     *@param args are the args we get from the cmd.
-     */
-    public static void main(String[] args) {
-        Ball[] ballsArray = new Ball[args.length ];
-        int[] radiusArray = new int[ballsArray.length];
-        Ball[] grayRectangleBalls = new Ball[args.length / 2];
-        Ball[] yellowRectangleBalls = new Ball[args.length - grayRectangleBalls.length];
-        MultipleFramesBouncingBallsAnimation example = new  MultipleFramesBouncingBallsAnimation();
-        MultipleBouncingBallsAnimation example1 = new MultipleBouncingBallsAnimation();
-        int guiWidth = 600;
-        int guiHeigth = 600;
-        GUI gui = new GUI("MultipleFramesBouncingBallsAnimation", guiWidth, guiHeigth);
-        int grayRectangleWidth = 450;
-        int grayRectangleHeigh = 450;
-        int yellowRectangleWidth = 150;
-        int yellowRectangleHeigh = 150;
-        double grayRectanglStartX = 50;
-        double grayRectanglStartY = 50;
-        double yellowRectangleStartX = 450;
-        double yellowRectangleStartY = 450;
-        //add cmd arguments to the radiusArray.
-        example1.convertArgumentsToInts(radiusArray, args);
-        //create the proper balls array.
-        example1.createBallsArray(ballsArray, guiWidth, guiHeigth, radiusArray);
-        //create two sub balls arrays, one for the yellow Rectangle,
-        // and for the gray.
-        example.createTwoSubBallesArrays(ballsArray, grayRectangleBalls,
-                yellowRectangleBalls, ballsArray.length);
-        //check if every ball is inside the proper rectange.
-        example.checkIfBallIsInDomain(grayRectangleBalls, grayRectanglStartX,
-                grayRectanglStartY, grayRectangleWidth, grayRectangleHeigh);
-        example.checkIfBallIsInDomain(yellowRectangleBalls, yellowRectangleStartX
-                , yellowRectangleStartY, yellowRectangleWidth, yellowRectangleHeigh);
+
+     static void prepareYellowRectangle (Ball[] yellowRectangleBalls, double yellowRectangleStartX
+            , double yellowRectangleStartY, int yellowRectangleWidth, int yellowRectangleHeight) {
+        //check if every ball is inside the proper rectangle.
+        checkIfBallIsInDomain(yellowRectangleBalls, yellowRectangleStartX
+                , yellowRectangleStartY, yellowRectangleWidth, yellowRectangleHeight);
         //set every ball the proper x,y domains.
-        example1.setBallsDomains(grayRectangleBalls, grayRectanglStartX,
-                grayRectanglStartY, grayRectangleWidth + grayRectanglStartX,
-                grayRectangleHeigh + grayRectanglStartY);
-        example1.setBallsDomains(yellowRectangleBalls, yellowRectangleStartX,
+         MultipleBouncingBallsAnimation.setBallsDomains(yellowRectangleBalls, yellowRectangleStartX,
                 yellowRectangleStartY, yellowRectangleWidth + yellowRectangleStartX
-                , yellowRectangleHeigh + yellowRectangleStartY);
+                , yellowRectangleHeight + yellowRectangleStartY);
         //arrange every sub balls array in ascending Order.
-        example1.ascendingOrder(grayRectangleBalls);
-        example1.ascendingOrder(yellowRectangleBalls);
+         MultipleBouncingBallsAnimation.ascendingOrder(yellowRectangleBalls);
         //set velocity to every ball.
-        example1.setVelocityToBallsArray(grayRectangleBalls);
-        example1.setVelocityToBallsArray(yellowRectangleBalls);
+         MultipleBouncingBallsAnimation.setVelocityToBallsArray(yellowRectangleBalls);
+        
+    }
+     static void prepareGrayRectangle (Ball[] grayRectangleBalls, double grayRectangleStartX
+            , double grayRectangleStartY, int grayRectangleWidth, int grayRectangleHeight) {
+        //check if every ball is inside the proper rectangle.
+        checkIfBallIsInDomain(grayRectangleBalls, grayRectangleStartX
+                , grayRectangleStartY, grayRectangleWidth, grayRectangleHeight);
+        //set every ball the proper x,y domains.
+         MultipleBouncingBallsAnimation.setBallsDomains(grayRectangleBalls, grayRectangleStartX,
+                grayRectangleStartY, grayRectangleWidth + grayRectangleStartX
+                , grayRectangleHeight + grayRectangleStartY);
+        //arrange every sub balls array in ascending Order.
+         MultipleBouncingBallsAnimation.ascendingOrder(grayRectangleBalls);
+        //set velocity to every ball.
+         MultipleBouncingBallsAnimation.setVelocityToBallsArray(grayRectangleBalls);
+
+    }
+    static private void drawAnimation(int[] radiusArray, int grayRectangleStartX, int grayRectangleStartY,
+                                      int grayRectangleWidth, int grayRectangleHeight, int yellowRectangleStartX,
+                                     int yellowRectangleStartY, int yellowRectangleWidth, int yellowRectangleHeight) {
+        int guiWidth = 600;
+        int guiHeight = 600;
+        GUI gui = new GUI("MultipleFramesBouncingBallsAnimation", guiWidth, guiHeight);
+        Ball[] ballsArray = new Ball[radiusArray.length ];
+        //create the proper balls array.
+        MultipleBouncingBallsAnimation.createBallsArray(ballsArray, guiWidth, guiHeight, radiusArray);
+        Ball[] grayRectangleBalls = new Ball[ballsArray.length / 2];
+        Ball[] yellowRectangleBalls = new Ball[ballsArray.length - grayRectangleBalls.length];
+        //create two sub balls arrays, one for the yellow Rectangle, one for the gray.
+        createTwoSubBallsArrays(ballsArray, grayRectangleBalls,
+                yellowRectangleBalls, ballsArray.length);
+        prepareYellowRectangle(yellowRectangleBalls, yellowRectangleStartX
+                , yellowRectangleStartY, yellowRectangleWidth, yellowRectangleHeight);
+        prepareGrayRectangle (grayRectangleBalls, grayRectangleStartX
+                , grayRectangleStartY, grayRectangleWidth, grayRectangleHeight);
+        Sleeper sleeper = new Sleeper();
         //show the balls animation.
-        biuoop.Sleeper sleeper = new biuoop.Sleeper();
         while (true) {
             DrawSurface d = gui.getDrawSurface();
             d.setColor(Color.GRAY);
-            d.fillRectangle((int) grayRectanglStartX, (int) grayRectanglStartY,
-                    grayRectangleWidth, grayRectangleHeigh);
+            d.fillRectangle( grayRectangleStartX, grayRectangleStartY,
+                    grayRectangleWidth, grayRectangleHeight);
             d.setColor(Color.YELLOW);
             d.fillRectangle((int) yellowRectangleStartX, (int) yellowRectangleStartY,
-                    yellowRectangleWidth, yellowRectangleHeigh);
+                    yellowRectangleWidth, yellowRectangleHeight);
             for (int i = 0; i <  grayRectangleBalls.length; i++) {
-                d.setColor(Color.BLACK);
+                d.setColor(Color.BLUE);
                 grayRectangleBalls[i].moveOneStep();
                 grayRectangleBalls[i].drawOn(d);
             }
             for (int i = 0; i <  yellowRectangleBalls.length; i++) {
-                d.setColor(Color.BLACK);
+                d.setColor(Color.WHITE);
                 yellowRectangleBalls[i].moveOneStep();
                 yellowRectangleBalls[i].drawOn(d);
             }
             sleeper.sleepFor(50);  // wait for 50 milliseconds.
             gui.show(d);
         }
+    }
+    /**
+     *@param args are the args we get from the cmd.
+     */
+    public static void main(String[] args) {
+        int[] radiusArray = new int[args.length];
+        //add cmd arguments to the radiusArray.
+        MultipleBouncingBallsAnimation.convertArgumentsToInts(radiusArray, args);
+        int grayRectangleWidth = 450;
+        int grayRectangleHeight = 450;
+        int yellowRectangleWidth = 150;
+        int yellowRectangleHeight = 150;
+        int grayRectangleStartX = 50;
+        int grayRectangleStartY = 50;
+        int yellowRectangleStartX = 450;
+        int yellowRectangleStartY = 450;
+        drawAnimation(radiusArray ,grayRectangleStartX, grayRectangleStartY, grayRectangleWidth,
+                grayRectangleHeight, yellowRectangleStartX, yellowRectangleStartY,
+                yellowRectangleWidth, yellowRectangleHeight );
     }
 }
