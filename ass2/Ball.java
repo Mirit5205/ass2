@@ -21,8 +21,8 @@ public class Ball implements Sprite {
     }
 
     public void addToGame (Game g) {
-        this.setVelocity(20, 37);
-        this.setGameEnvironment(g.getGameEniorment());
+        this.setVelocity(8, 11);
+        this.setGameEnvironment(g.getEvniorment());
         if (g.getSpirtes().getSpritesList() == null) {
             g.getSpirtes().initializeSpiritList();
             g.getSpirtes().getSpritesList().add(this);
@@ -92,8 +92,8 @@ public class Ball implements Sprite {
         int x = this.getX();
         int y = this.getY();
         int radius = this.getRadius();
-        surface.fillCircle(x, y, radius);
         surface.setColor(this.getColor());
+        surface.fillCircle(x, y, radius);
     }
 
     /**
@@ -184,18 +184,25 @@ public class Ball implements Sprite {
     //maybe change the siganture of this method to hold refernce of trajectory line?
     public void moveOneStep(CollisionInfo collisionInfo) {
         Line trajectory = this.getTrajectoryLine();
-        Point newCenter = this.getVelocity().applyToPoint(this.center);
+        Ball b = this;
+        Point newCenter = this.getVelocity().applyToPoint(this.getCenter());
         double dx = this.getVelocity().getDx();
         double dy = this.getVelocity().getDy();
         //if there is a hit
         if (isCollide(trajectory, newCenter, collisionInfo.getCollisionPoint()) ){
+            System.out.println("ball center" + newCenter);
+
+            System.out.println("collision point" + collisionInfo.getCollisionPoint());
             // the hit method in collidable interface
             this.setVelocity(collisionInfo.getCollisionObject().
-                    hit(collisionInfo, this.getVelocity(), newCenter, this.getCenter()));
-            this.setCenter(this.getVelocity().applyToPoint(collisionInfo.getCollisionPoint()));
-            //maybe work better this.setCenter(this.getVelocity().applyToPoint(this.getCenter()));
+                    hit(collisionInfo, this.getVelocity(), this.getCenter()));
+            //maybe work better
+            //Point CollisionCenter = collisionInfo.getCollisionPoint();
+            //this.setCenter(this.getVelocity().applyToPoint(CollisionCenter));
+             this.setCenter(this.getVelocity().applyToPoint(this.getCenter()));
         } else {
-            this.setCenter (this.getVelocity().applyToPoint(this.getCenter()));
+            //newCenter = this.getVelocity().applyToPoint(this.getCenter());
+            this.setCenter (newCenter);
         }
     }
 
