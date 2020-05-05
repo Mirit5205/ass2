@@ -1,65 +1,70 @@
+import java.util.List;
+
 /**
- *autor hezi yaffe 208424242.
+ * author hezi yaffe 208424242.
  */
 public class Line {
-   private Point start;
-   private Point end;
-   /**
-    *@param start is the starting point.
-    *@param end is the ending point.
-    */
-   // constructors.
-   public Line(Point start, Point end) {
-   this.start = start;
-   this.end = end;
-   }
-   /**
-    *@param x1 is the x of the starting point.
-    *@param y1 is the y of the starting point
-    *@param x2 is the x of the ending point.
-    *@param y2 is the y of the ending point
-    */
-   public Line(double x1, double y1, double x2, double y2) {
-   this.start = new Point(x1, y1);
-   this.end = new Point(x2, y2);
-   }
-   /**
-    *@return length of the given line.
-    */
-   // Return the length of the line.
-   public double length() {
-   return (this.start).distance(this.end);
-   }
-   /**
-    *@return the middle point of an given line.
-    */
-   // Returns the middle point of the line.
-   public Point middle() {
-   Point point1 = new Point((this.start.getX() + this.end.getX()) / 2,
-   (this.start.getY() + this.end.getY()) / 2);
-   return point1;
-   }
-   /**
-    *@return the start point of the line.
-    */
-   public Point start() {
-   return this.start;
-   }
-   /**
-    *@return the end point of the line.
-    */
-   public Point end() {
-   return this.end;
-   }
-   /**
-    *@param other is another line.
-    *@return true if the lines Intersected, otherwise false.
-    */
-   public boolean isIntersecting(Line other) {
-       /* if (this.equals(other)) {
-            return false;
-        }
-        */
+    private Point start;
+    private Point end;
+
+    /**
+     * @param start is the starting point.
+     * @param end   is the ending point.
+     */
+    // constructors.
+    public Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    /**
+     * @param x1 is the x of the starting point.
+     * @param y1 is the y of the starting point
+     * @param x2 is the x of the ending point.
+     * @param y2 is the y of the ending point
+     */
+    public Line(double x1, double y1, double x2, double y2) {
+        this.start = new Point(x1, y1);
+        this.end = new Point(x2, y2);
+    }
+
+    /**
+     * @return length of the given line.
+     */
+    // Return the length of the line.
+    public double length() {
+        return (this.start).distance(this.end);
+    }
+
+    /**
+     * @return the middle point of an given line.
+     */
+    // Returns the middle point of the line.
+    public Point middle() {
+        Point point1 = new Point((this.start.getX() + this.end.getX()) / 2,
+                (this.start.getY() + this.end.getY()) / 2);
+        return point1;
+    }
+
+    /**
+     * @return the start point of the line.
+     */
+    public Point start() {
+        return this.start;
+    }
+
+    /**
+     * @return the end point of the line.
+     */
+    public Point end() {
+        return this.end;
+    }
+
+    /**
+     * @param other is another line.
+     * @return true if the lines Intersected, otherwise false.
+     */
+    public boolean isIntersecting(Line other) {
         // Line AB represented as a1x + b1y = c1
         double a1 = this.end().getY() - this.start().getY(); //B.y - A.y;
         double b1 = this.start().getX() - this.end().getX(); //A.x - B.x;
@@ -71,9 +76,10 @@ public class Line {
         double determinant = a1 * b2 - a2 * b1;
         return determinant != 0;
     }
+
     /**
-     *@param other is another line.
-     *@return intersection Point of two given lines.
+     * @param other is another line.
+     * @return intersection Point of two given lines.
      */
     public Point intersectionWith(Line other) {
         // Line AB represented as a1x + b1y = c1
@@ -93,24 +99,46 @@ public class Line {
         double y = (a1 * c2 - a2 * c1) / determinant;
         return new Point(x, y);
     }
+
     /**
-     *@param other is the intersection Point.
-     *@return true if point in section, otherwise false.
+     * @param other is the intersection Point.
+     * @return true if point in section, otherwise false.
      */
     public boolean isPointInSection(Point other) {
-      /*if (this.start().distance(other) + other.distance(this.end()) - this.length() <= 0.00000000000005) {
-          return true;
-      } else {
-          return false;
-      }
-      */
-      return (this.start().distance(other) + other.distance(this.end()) - this.length() <= 0.00000000000005);
+        return (this.start().distance(other) + other.distance(this.end()) - this.length() <= Rectangle.EPSILON);
     }
+
     /**
-     *@param other is another line.
-     *@return true if the lines are equal, false otherwise.
+     * @param other is another line.
+     * @return true if the lines are equal, false otherwise.
      */
-   public boolean equals(Line other) {
-   return ((this.start.equals(other.start)) && (this.end.equals(other.end)));
-   }
+    public boolean equals(Line other) {
+        return ((this.start.equals(other.start)) && (this.end.equals(other.end)));
+    }
+
+    /**
+     * find intersection points bewteen given line and given
+     * rectangle and then find the closest intersection point
+     * to the start of line.
+     * @param r is the rectangle we check his intersection points.
+     * @return the closest intersection point to the start of a
+     * given line.
+     */
+    public Point closestIntersectionToStartOfLine(Rectangle r) {
+        List<Point> interSectionPoints = r.intersectionPoints(new Line(this.start, this.end));
+        if (interSectionPoints.isEmpty()) {
+            return null;
+        } else {
+            double minDistance = this.start.distance(interSectionPoints.get(0));
+            Point interSectionClosestPoint = interSectionPoints.get(0);
+            for (Point p : interSectionPoints) {
+                if (this.start.distance(p) < minDistance) {
+                    minDistance = this.start.distance(p);
+                    interSectionClosestPoint = p;
+                }
+            }
+            return interSectionClosestPoint;
+
+        }
+    }
 }
