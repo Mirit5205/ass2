@@ -191,7 +191,7 @@ public class Ball implements Sprite {
         if (isCollide(trajectory, noCollideNewCenter, collisionInfo.getCollisionPoint())) {
             //ball is'nt stuck inside block, but i get null after a while
             newVelocity = collisionInfo.getCollisionObject().
-                    hit(collisionInfo, this.getVelocity());
+                    hit(collisionInfo, this.getVelocity(), this);
             collideNewCenter = newVelocity.applyToPoint(tmpCenter);
             //if the new center is inside a block
             if (isBallInBlock(collideNewCenter)) {
@@ -199,7 +199,7 @@ public class Ball implements Sprite {
             } else {
                 // the hit method in collidable interface
                 this.setVelocity(collisionInfo.getCollisionObject().
-                        hit(collisionInfo, this.getVelocity()));
+                        hit(collisionInfo, this.getVelocity(), this));
             }
             Point newCenter = this.getVelocity().applyToPoint(collisionInfo.getCollisionPoint());
             remainBallInsideTheGui(newCenter);

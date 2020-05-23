@@ -6,10 +6,11 @@ import java.util.List;
 /**
  * author hezi yaffe 208424242.
  */
-public class Block implements Collidable, Sprite {
+public class Block implements Collidable, Sprite, HitNotifier {
     private Rectangle rectangle;
     private int hitCounter;
     private static java.awt.Color color;
+    private List<HitListener> hitListeners;
     //constants
     private static final int BLOCK_HEIGHT = 20;
     private static final int BLOCK_WIDTH = 50;
@@ -90,6 +91,11 @@ public class Block implements Collidable, Sprite {
         g.getSpirtes().addSprite(this);
     }
 
+    public void removeFromGame(Game game) {
+        game.removeCollidable(this);
+        game.removeSprite(this);
+    }
+
     /**
      * @param dx is the ball dx velocity.
      * @param collisionPoint is the Collision point
@@ -119,7 +125,8 @@ public class Block implements Collidable, Sprite {
      * @return is the new velocity expected after the hit (based on
      * the force the object inflicted on us)
      */
-    public Velocity hit(CollisionInfo c, Velocity currentVelocity) {
+    public Velocity hit(CollisionInfo c, Velocity currentVelocity, Ball hitter) {
+        this.notifyHit(hitter);
         this.hitCounter--;
         double dx = currentVelocity.getDx();
         double dy = currentVelocity.getDy();
@@ -356,6 +363,29 @@ public class Block implements Collidable, Sprite {
             blockArr[i].setColor(color.GREEN);
         }
         return blockArr;
+    }
+
+    // Add hl as a listener to hit events.
+    public void addHitListener(HitListener hl) {
+        this.hitListeners.add(hl);
+    }
+
+    // Remove hl from the list of listeners to hit events.
+    public void removeHitListener(HitListener hl) {
+        this.hitListeners.remove(hl);
+    }
+
+    public void initializeHitListenersList() {
+        this.hitListeners = new ArrayList<HitListener>();
+    }
+
+    private void notifyHit(Ball hitter) {
+        // Make a copy of the hitListeners before iterating over them.
+        List<HitListener> listeners = new ArrayList<HitListener>(this.hitListeners);
+        // Notify all listeners about a hit event:
+        for (HitListener hl : listeners) {
+            hl.hitEvent(this, hitter);
+        }
     }
 }
 

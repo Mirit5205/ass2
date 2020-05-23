@@ -112,7 +112,7 @@ public class Paddle implements Sprite, Collidable {
      * @param currentVelocity is the ball velocity while the collision occur.
      * @return the new ball velocity according the instructions.
      */
-    public Velocity hit(CollisionInfo c, Velocity currentVelocity) {
+    public Velocity hit(CollisionInfo c, Velocity currentVelocity, Ball hitter) {
 
         Velocity newVelocity = currentVelocity;
         double dx = currentVelocity.getDx();

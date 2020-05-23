@@ -15,5 +15,5 @@ public interface Collidable {
      * @return is the new velocity expected after the hit (based on
      * the force the object inflicted on us).
      */
-      Velocity hit(CollisionInfo c, Velocity currentVelocity);
+      Velocity hit(CollisionInfo c, Velocity currentVelocity, Ball hitter);
 }
