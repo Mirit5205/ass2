@@ -1,4 +1,6 @@
 import biuoop.DrawSurface;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -198,8 +200,7 @@ public class Ball implements Sprite {
                 this.setVelocity(makeSureBallNotStuckInCollidable());
             } else {
                 // the hit method in collidable interface
-                this.setVelocity(collisionInfo.getCollisionObject().
-                        hit(collisionInfo, this.getVelocity(), this));
+                this.setVelocity(newVelocity);
             }
             Point newCenter = this.getVelocity().applyToPoint(collisionInfo.getCollisionPoint());
             remainBallInsideTheGui(newCenter);
@@ -341,5 +342,19 @@ public class Ball implements Sprite {
                && (ballCenter.getX() <= p.getX() + width))
                && (ballCenter.getY() >= p.getY() && ballCenter.getY()
                <= p.getY() + height);
+    }
+
+    public void removeFromGameEnviorment(Block b) {
+        List<Collidable> originalCollidables = this.getGameEnvironment().getCollidablesList();
+        List<Collidable> duplicateOfOriginalCollidables = new ArrayList<Collidable>(originalCollidables);
+        duplicateOfOriginalCollidables.remove(b);
+        GameEnvironment newEnviorment = new GameEnvironment();
+        newEnviorment.setCollidableList(duplicateOfOriginalCollidables);
+        this.setGameEnvironment(newEnviorment);
+    }
+
+    public void removeFromGame(Game g, Block beingHit) {
+        g.removeSprite(this);
+        this.removeFromGameEnviorment(beingHit);
     }
 }

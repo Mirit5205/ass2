@@ -1,8 +1,8 @@
 import biuoop.GUI;
 import biuoop.DrawSurface;
 import biuoop.Sleeper;
+
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +12,7 @@ public class Game {
     private SpriteCollection sprites;
     private GameEnvironment enviroment;
     private GUI gui;
-    private Counter counter;
+    private Counter[] counters;
 
     //private constants.
     private static final int BALL_RADIUS = 8;
@@ -20,6 +20,9 @@ public class Game {
     private static final int PADDLE_HEIGHT = 10;
     private static final int PADDLE_UPPER_LEFT_X = 250;
     private static final int PADDLE_UPPER_LEFT_Y = 500;
+    private static final int NUM_OF_BALLS = 50;
+    private static final int END_GAME_MILLISECONDS = 800;
+    private static final int BREAK_ALL_BLOCKS_SCORES = 100;
 
     //public constants.
     public static final int GUI_WIDTH = 800;
@@ -70,19 +73,23 @@ public class Game {
 
         Block[] edges = new Block[4];
         //for the top edge
-        Point upperLeft1 = new Point(GUI_UPPER_LEFT_X, GUI_UPPER_LEFT_Y);
+        Point upperLeft1 = new Point(GUI_UPPER_LEFT_X, GUI_UPPER_LEFT_Y + 30);
         //for the left edge
         Point upperLeft2 = new Point(GUI_UPPER_LEFT_X, GUI_UPPER_LEFT_Y);
         //for the bottom edge
-        Point bottomRight1 = new Point(GUI_UPPER_LEFT_X, GUI_HEIGHT - GUI_BLOCK_EDGE_SIZE);
+        Point bottomRight1 = new Point(GUI_UPPER_LEFT_X + GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT - GUI_BLOCK_EDGE_SIZE);
         //for the right edge
         Point bottomRight2 = new Point(GUI_WIDTH - GUI_BLOCK_EDGE_SIZE, GUI_UPPER_LEFT_Y);
         // the gui edges as blocks
         edges[0] = new Block(new Rectangle(upperLeft1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
         edges[1] = new Block(new Rectangle(upperLeft2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
-        edges[2] = new Block(new Rectangle(bottomRight1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
+        edges[2] = new Block(new Rectangle(bottomRight1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE ));
         edges[3] = new Block(new Rectangle(bottomRight2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
         for (int i = 0; i < edges.length; i++) {
+            if (i == 2) {
+                edges[i].setColor(new Color(0, 4, 128));
+                continue;
+            }
             edges[i].setColor(Color.GRAY);
         }
         return edges;
@@ -93,15 +100,16 @@ public class Game {
      * add the blocks in the edges to the game.
      */
     public void addEdgesToGame(Game g) {
-        //PrintingHitListener p = new PrintingHitListener();
-        //BlockRemover remover = new BlockRemover(this, this.counter);
         Block[] edges = createEdgesArr();
+        this.counters[1] = new Counter(NUM_OF_BALLS);
+        BallRemover ballRemover =  new BallRemover(this, this.getRemainingBallsCounter());
         //add edges to the game
-        for (Block b : edges) {
-            b.initializeHitListenersList();
-            b.addToGame(g);
-            //b.addHitListener(p);
-            //b.addHitListener(remover);
+        for (int i = 0; i < edges.length; i++) {
+            edges[i].initializeHitListenersList();
+            edges[i].addToGame(g);
+            if (i == 2) {
+                edges[i].addHitListener(ballRemover);
+            }
         }
     }
 
@@ -109,34 +117,24 @@ public class Game {
      * @param g is the current game.
      * create a ball set his velocity and add it to game.
      */
-    public static void addBallToGame(Game g) {
-        Ball ball1 = new Ball(300, 400, BALL_RADIUS, java.awt.Color.BLACK);
-        Ball ball2 = new Ball(200, 279, BALL_RADIUS, java.awt.Color.BLACK);
-        Ball ball3 = new Ball(210, 355, BALL_RADIUS, java.awt.Color.BLACK);
-        Ball ball4 = new Ball(225, 330, BALL_RADIUS, java.awt.Color.BLACK);
-        Ball ball5 = new Ball(253, 240, BALL_RADIUS, java.awt.Color.BLACK);
-        Ball ball6 = new Ball(435, 290, BALL_RADIUS, java.awt.Color.BLACK);
+    public void addBallToGame(Game g) {
+        Ball[] ballsArr = new Ball[NUM_OF_BALLS];
+        Velocity[] velocityArr = new Velocity[NUM_OF_BALLS];
+        //random location for the balls (x,y)
+        int[] randomArr = new int[NUM_OF_BALLS * 2];
 
-        Velocity v1 =  Velocity.fromAngleAndSpeed(280, 12);
-        ball1.setVelocity(v1);
-        Velocity v2 =  Velocity.fromAngleAndSpeed(310, 9);
-        ball2.setVelocity(v2);
-        Velocity v3 =  Velocity.fromAngleAndSpeed(310, 9);
-        ball3.setVelocity(v3);
-        Velocity v4 =  Velocity.fromAngleAndSpeed(310, 9);
-        ball4.setVelocity(v4);
-        Velocity v5 =  Velocity.fromAngleAndSpeed(310, 9);
-        ball5.setVelocity(v5);
-        Velocity v6 =  Velocity.fromAngleAndSpeed(310, 9);
-        ball6.setVelocity(v6);
+        for (int i = 0; i < randomArr.length - 1; i++) {
+            randomArr[i] = (int)(Math.random() * 100 + 200);
+            randomArr[i + 1] = (int)(Math.random() * 100 + 300);
+        }
 
-        ball1.addToGame(g);
-        ball2.addToGame(g);
-        ball3.addToGame(g);
-        ball4.addToGame(g);
-        ball5.addToGame(g);
-        ball6.addToGame(g);
+        for (int i = 0; i < NUM_OF_BALLS; i++) {
+            ballsArr[i] = new Ball(randomArr[i], randomArr[i + 1], BALL_RADIUS, java.awt.Color.BLACK);
+            velocityArr[i] = Velocity.fromAngleAndSpeed(280, 12);
+            ballsArr[i].setVelocity(velocityArr[i]);
+            ballsArr[i].addToGame(g);
 
+        }
     }
 
     /**
@@ -157,7 +155,8 @@ public class Game {
     public void addBlocksToGame(Game g) {
         //counting the removeable blocks in the game
         int counter = 0;
-        List<Block[]> listOfBlocksArr = Block.createListOfBlocksArr();
+        //List<Block[]> listOfBlocksArr = Block.createListOfBlocksArr();
+        List<Block[]> listOfBlocksArr = Block.createGameBlocks();
         for (Block[] b : listOfBlocksArr) {
             for (int i = 0; i < b.length; i++) {
                 b[i].initializeHitListenersList();
@@ -166,15 +165,21 @@ public class Game {
             }
         }
 
-        //initial counter filed and blockRemover event
-        this.counter = new Counter(counter);
-        BlockRemover remover = new BlockRemover(this, this.counter);
+        /* initial blockRemover counter (counters[0]), blockRemover event,
+         * ScoreTrackingListener counter (counters[2]), ScoreTrackingListener event.
+         */
+        this.counters[0] = new Counter(counter);
+        this.counters[2] = new Counter(0);
+        BlockRemover remover = new BlockRemover(this, this.getRemainingBlocksCounter());
+        ScoreTrackingListener score = new ScoreTrackingListener(this.getScoresCounter(),
+                this.getRemainingBlocksCounter());
 
         //add BlockRemover hit listener to every removable block
         for (Block[] b : listOfBlocksArr) {
             for (int i = 0; i < b.length; i++) {
                 b[i].initializeHitListenersList();
                 b[i].addHitListener(remover);
+                b[i].addHitListener(score);
             }
         }
 
@@ -194,6 +199,7 @@ public class Game {
     public void removeSprite(Sprite s) {
         this.sprites.getSprites().remove(s);
     }
+
     /**
      * @param g is the current game.
      * creating a GUI and new GameEnviorment and
@@ -211,11 +217,13 @@ public class Game {
      * and add them to the game.
      */
     public void initialize() {
+        initializeGameCounterArr();
         initializeGameFileds(this);
         addBallToGame(this);
         addEdgesToGame(this);
         addBlocksToGame(this);
         addPaddleToGame(this);
+        addScoreCounterToGame();
     }
 
     /**
@@ -224,7 +232,8 @@ public class Game {
      public void run() {
         int framesPerSecond = 60;
         int millisecondsPerFrame = 1000 / framesPerSecond;
-        while (true) {
+        Sleeper sleeper = new Sleeper();
+         while (true) {
             long startTime = System.currentTimeMillis(); // timing
             DrawSurface d =  this.getGui().getDrawSurface();
             drawGuiBackground(d);
@@ -236,16 +245,37 @@ public class Game {
             long usedTime = System.currentTimeMillis() - startTime;
             long milliSecondLeftToSleep = millisecondsPerFrame - usedTime;
             if (milliSecondLeftToSleep > 0) {
-                Sleeper sleeper = new Sleeper();
                 sleeper.sleepFor(milliSecondLeftToSleep);
             }
-            if (this.counter.getValue() == 0) {
+
+            //using -1 as a flag in order to get another round of run()
+            if (this.getRemainingBlocksCounter().getValue() == -1) {
+                sleeper.sleepFor(END_GAME_MILLISECONDS);
                 this.getGui().close();
                 return;
+            }
+
+            if (isThereNoBlocksLeft(this.getRemainingBlocksCounter())) {
+                this.getScoresCounter().increase(BREAK_ALL_BLOCKS_SCORES);
+                this.getRemainingBlocksCounter().decrease(1);
+            }
+
+            if (isThereNoBallsLeft(this.getRemainingBallsCounter())) {
+                sleeper.sleepFor(END_GAME_MILLISECONDS);
+                this.getGui().close();
+                return;
+
             }
         }
     }
 
+    public Boolean isThereNoBlocksLeft(Counter blocksCounter) {
+         return blocksCounter.getValue() == 0;
+    }
+
+    public Boolean isThereNoBallsLeft(Counter ballsCounter) {
+        return ballsCounter.getValue() == 0;
+    }
     /**
      * according the instructions, paint GUI back-ground in dark blue.
      * @param d is the drawing surface.
@@ -256,7 +286,29 @@ public class Game {
         d.fillRectangle(Game.GUI_UPPER_LEFT_X, Game.GUI_UPPER_LEFT_Y, Game.GUI_WIDTH, Game.GUI_HEIGHT);
     }
 
-    public Counter getCounter() {
-        return this.counter;
+    public Counter getRemainingBlocksCounter() {
+        return this.counters[0];
     }
+
+    public Counter getRemainingBallsCounter() {
+        return this.counters[1];
+    }
+
+    public Counter getScoresCounter() {
+        return this.counters[2];
+    }
+
+    public void initializeGameCounterArr() {
+        this.counters = new Counter[3];
+    }
+
+    public ScoreIndicator initializeScoreIndicator() {
+       return new ScoreIndicator(this.getScoresCounter());
+    }
+
+    public void addScoreCounterToGame() {
+        ScoreIndicator scoreCounter = initializeScoreIndicator();
+        this.addSprite(scoreCounter);
+    }
+
 }

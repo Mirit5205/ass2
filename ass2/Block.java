@@ -14,6 +14,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
     //constants
     private static final int BLOCK_HEIGHT = 20;
     private static final int BLOCK_WIDTH = 50;
+    private static final int BLOCK_Y_START_POINT = 80;
 
     //constructors
     /**
@@ -200,10 +201,6 @@ public class Block implements Collidable, Sprite, HitNotifier {
         Point upperLeft = this.getCollisionRectangle().getUpperLeft();
         double height = this.getCollisionRectangle().getHeight();
         double width = this.getCollisionRectangle().getWidth();
-        //location of the hit counter
-        int hitCounterXLocation = (int) (upperLeft.getX() + width / 2 - 2);
-        int hitCounterYLocation = (int) (upperLeft.getY() + height / 2 + 2);
-        String hit = Integer.toString(this.hitCounter);
         //assign color variable the block color
         Color c = this.getCollisionRectangle().getColor();
         //draw the block edges in black
@@ -214,13 +211,6 @@ public class Block implements Collidable, Sprite, HitNotifier {
         surface.setColor(c);
         surface.fillRectangle((int) upperLeft.getX(), (int) upperLeft.getY(),
                 (int) width, (int) height);
-        //draw the hit counter in white
-        surface.setColor(Color.white);
-        if (this.hitCounter < 1) {
-            surface.drawText(hitCounterXLocation, hitCounterYLocation, "x", 10);
-        } else {
-            surface.drawText(hitCounterXLocation, hitCounterYLocation, hit, 10);
-        }
     }
 
     /**
@@ -247,138 +237,32 @@ public class Block implements Collidable, Sprite, HitNotifier {
     }
 
     /**
-     * @return is a list of blocks array, the game's blocks lines
-     * that appear when we iniialize the game,
-     * according the assignment instructions.
+     * Add hl as a listener to hit events.
+     * @param hl is the element we want to add.
      */
-    public static List<Block[]> createListOfBlocksArr() {
-        List<Block[]> listOfBlocksArr = new ArrayList<Block[]>();
-        listOfBlocksArr.add(createFirstLineOfBlocks());
-        listOfBlocksArr.add(createSecondLineOfBlocks());
-        listOfBlocksArr.add(createThirdLineOfBlocks());
-        listOfBlocksArr.add(createFourthLineOfBlocks());
-        listOfBlocksArr.add(createFifthLineOfBlocks());
-        listOfBlocksArr.add(createSixthLineOfBlocks());
-        return listOfBlocksArr;
-
-    }
-
-    /**
-     * @return is blocks array, the game's first blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createFirstLineOfBlocks() {
-        Block[] blockArr = new Block[12];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 60);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY();
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 2);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.GRAY);
-        }
-        return blockArr;
-    }
-
-    /**
-     * @return is blocks array, the game's second blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createSecondLineOfBlocks() {
-        Block[] blockArr = new Block[11];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 80);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY() + 1;
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.RED);
-        }
-        return blockArr;
-    }
-
-    /**
-     * @return is blocks array, the game's third blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createThirdLineOfBlocks() {
-        Block[] blockArr = new Block[10];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 100);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY() + 1;
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.YELLOW);
-        }
-        return blockArr;
-    }
-
-    /**
-     * @return is blocks array, the game's forth blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createFourthLineOfBlocks() {
-        Block[] blockArr = new Block[9];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 120);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY() + 1;
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.BLUE);
-        }
-        return blockArr;
-    }
-
-    /**
-     * @return is blocks array, the game's fifth blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createFifthLineOfBlocks() {
-        Block[] blockArr = new Block[8];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 140);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY() + 1;
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.PINK);
-        }
-        return blockArr;
-    }
-
-    /**
-     * @return is blocks array, the game's sixth blocks line,
-     * according the assignment instructions.
-     */
-    public static Block[] createSixthLineOfBlocks() {
-        Block[] blockArr = new Block[7];
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - BLOCK_WIDTH, 160);
-        double upperLeftX = upperLeft.getX();
-        double upperLeftY = upperLeft.getY() + 1;
-        for (int i = 0; i < blockArr.length; i++) {
-            blockArr[i] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT, 1);
-            upperLeftX -= BLOCK_WIDTH;
-            blockArr[i].setColor(color.GREEN);
-        }
-        return blockArr;
-    }
-
-    // Add hl as a listener to hit events.
     public void addHitListener(HitListener hl) {
         this.hitListeners.add(hl);
     }
 
-    // Remove hl from the list of listeners to hit events.
+    /**
+     * Remove hl from the list of listeners to hit events.
+     * @param hl is the element we want to remove.
+     */
     public void removeHitListener(HitListener hl) {
         this.hitListeners.remove(hl);
     }
 
+    /**
+     * initialize hit listeners list.
+     */
     public void initializeHitListenersList() {
         this.hitListeners = new ArrayList<HitListener>();
     }
 
+    /**
+     * Notify all listeners about a hit event.
+     * @param hitter is the ball that perform the hit event.
+     */
     private void notifyHit(Ball hitter) {
         // Make a copy of the hitListeners before iterating over them.
         List<HitListener> listeners = new ArrayList<HitListener>(this.hitListeners);
@@ -387,5 +271,55 @@ public class Block implements Collidable, Sprite, HitNotifier {
             hl.hitEvent(this, hitter);
         }
     }
+
+    /**
+     * creating score block.
+     * @return score block at the top of the GUI
+     * according to instructions.
+     */
+    public static Block createScoreBlock() {
+        Block scoreBlock;
+        //upper left point of the GUI
+        Point upperLeft = new Point(Game.GUI_UPPER_LEFT_X, Game.GUI_UPPER_LEFT_Y);
+        scoreBlock = new Block(new Rectangle(upperLeft, Game.GUI_WIDTH, Game.GUI_BLOCK_EDGE_SIZE + 10));
+        scoreBlock.setColor(Color.white);
+        return scoreBlock;
+    }
+
+    /**
+     * @return is a list of blocks array, the game's blocks lines
+     * that appear when we iniialize the game,
+     * according the assignment instructions.
+     */
+    public static List<Block[]> createGameBlocks() {
+        List<Block[]> blocksArrList = new ArrayList<>();
+        //array of colors, color for every line of blocks
+        Color[] colorArr = {color.GRAY, color.GREEN, color.RED, color.PINK, color.YELLOW, color.BLUE};
+        //blocks lines size
+        Block[][] arrayOfBlockArr = {new Block[12], new Block[11], new Block[10],
+                new Block[9], new Block[8], new Block[7]};
+        //x location of the first block in every line
+        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE
+                - BLOCK_WIDTH, BLOCK_Y_START_POINT);
+        double upperLeftX = upperLeft.getX();
+        double upperLeftY = upperLeft.getY();
+        //initial blocks array
+        for (int i = 0; i < arrayOfBlockArr.length; i++) {
+            for (int j = 0; j < arrayOfBlockArr[i].length; j++) {
+                arrayOfBlockArr[i][j] = new Block(upperLeftX, upperLeftY, BLOCK_WIDTH, BLOCK_HEIGHT);
+                arrayOfBlockArr[i][j].setColor(colorArr[i]);
+                //gap between blocks
+                upperLeftX -= BLOCK_WIDTH;
+            }
+            //initial x location of the first block in every line
+            // (we modify it in the inner loop)
+            upperLeftX = upperLeft.getX();
+            //initial y location of the first block in every line
+            upperLeftY = upperLeftY + BLOCK_HEIGHT;
+            blocksArrList.add(arrayOfBlockArr[i]);
+        }
+        return blocksArrList;
+    }
+
 }
 

@@ -94,4 +94,7 @@ public class GameEnvironment {
         return this.collidables;
     }
 
+    public void setCollidableList(List<Collidable> c) {
+        this.collidables = c;
+    }
 }
