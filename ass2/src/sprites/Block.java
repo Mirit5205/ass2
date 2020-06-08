@@ -1,6 +1,6 @@
 package sprites;
 
-import application.Game;
+import application.GameLevel;
 import biuoop.DrawSurface;
 import collidefeatures.CollisionInfo;
 import collidefeatures.Velocity;
@@ -24,9 +24,9 @@ public class Block implements Collidable, Sprite, HitNotifier {
     private static java.awt.Color color;
     private List<HitListener> hitListeners;
     //constants
-    private static final int BLOCK_HEIGHT = 20;
-    private static final int BLOCK_WIDTH = 50;
-    private static final int BLOCK_Y_START_POINT = 80;
+    public static final int BLOCK_HEIGHT = 20;
+    public static final int BLOCK_WIDTH = 50;
+    public static final int BLOCK_Y_START_POINT = 80;
 
     //constructors
     /**
@@ -99,7 +99,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * add block to the game by adding him to the relevant lists.
      * @param g is the game.
      */
-    public void addToGame(Game g) {
+    public void addToGame(GameLevel g) {
         g.getEvniorment().addCollidable(this);
         g.getSpirtes().addSprite(this);
     }
@@ -108,7 +108,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * remove block from current game.
      * @param game is the current game.
      */
-    public void removeFromGame(Game game) {
+    public void removeFromGame(GameLevel game) {
         game.removeCollidable(this);
         game.removeSprite(this);
     }
@@ -119,8 +119,8 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @return true if the next step of the ball is outside the GUI (axe X).
      */
     public boolean isCollisionPointOutOfTheXEdges(double dx , Point collisionPoint) {
-      return (collisionPoint.getX() >= Game.GUI_WIDTH - dx
-              || collisionPoint.getX() <= Game.GUI_BLOCK_EDGE_SIZE - dx);
+      return (collisionPoint.getX() >= GameLevel.GUI_WIDTH - dx
+              || collisionPoint.getX() <= GameLevel.GUI_BLOCK_EDGE_SIZE - dx);
     }
 
     /**
@@ -129,8 +129,8 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @return true if the next step of the ball is outside the GUI (axe Y).
      */
     public boolean isCollisionPointOutOfTheYEdges(double dy, Point collisionPoint) {
-        return (collisionPoint.getY() >= Game.GUI_HEIGHT - dy
-                || collisionPoint.getY() <= Game.GUI_BLOCK_EDGE_SIZE - dy);
+        return (collisionPoint.getY() >= GameLevel.GUI_HEIGHT - dy
+                || collisionPoint.getY() <= GameLevel.GUI_BLOCK_EDGE_SIZE - dy);
     }
 
     /**
@@ -297,8 +297,8 @@ public class Block implements Collidable, Sprite, HitNotifier {
     public static Block createScoreBlock() {
         Block scoreBlock;
         //upper left point of the GUI
-        Point upperLeft = new Point(Game.GUI_UPPER_LEFT_X, Game.GUI_UPPER_LEFT_Y);
-        scoreBlock = new Block(new Rectangle(upperLeft, Game.GUI_WIDTH, Game.GUI_BLOCK_EDGE_SIZE + 10));
+        Point upperLeft = new Point(GameLevel.GUI_UPPER_LEFT_X, GameLevel.GUI_UPPER_LEFT_Y);
+        scoreBlock = new Block(new Rectangle(upperLeft, GameLevel.GUI_WIDTH, GameLevel.GUI_BLOCK_EDGE_SIZE + 10));
         scoreBlock.setColor(Color.white);
         return scoreBlock;
     }
@@ -316,7 +316,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
         Block[][] arrayOfBlockArr = {new Block[12], new Block[11], new Block[10],
                 new Block[9], new Block[8], new Block[7]};
         //x location of the first block in every line
-        Point upperLeft = new Point(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE
+        Point upperLeft = new Point(GameLevel.GUI_WIDTH - GameLevel.GUI_BLOCK_EDGE_SIZE
                 - BLOCK_WIDTH, BLOCK_Y_START_POINT);
         double upperLeftX = upperLeft.getX();
         double upperLeftY = upperLeft.getY();

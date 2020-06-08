@@ -1,4 +1,4 @@
-import application.Game;
+import application.GameLevel;
 
 /**
  * author hezi yaffe 208424242.
@@ -9,7 +9,7 @@ public class Ass5Game {
      * @param args not used.
      */
     public static void main(String[] args) {
-        Game game = new Game();
+        GameLevel game = new GameLevel();
         game.initialize();
         game.run();
         }

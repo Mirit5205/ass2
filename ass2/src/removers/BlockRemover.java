@@ -1,6 +1,6 @@
 package removers;
 
-import application.Game;
+import application.GameLevel;
 import gameelements.Counter;
 import interfaces.HitListener;
 import sprites.Ball;
@@ -12,14 +12,14 @@ import sprites.Block;
  * author hezi yaffe 208424242.
  */
 public class BlockRemover implements HitListener {
-    private Game game;
+    private GameLevel game;
     private Counter remainingBlocks;
 
     /**
      * @param g is the game.
      * @param removedBlocks is the counter of remaining blocks.
      */
-    public BlockRemover(Game g, Counter removedBlocks) {
+    public BlockRemover(GameLevel g, Counter removedBlocks) {
         this.game = g;
         this.remainingBlocks = removedBlocks;
     }

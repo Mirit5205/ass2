@@ -1,6 +1,6 @@
 package sprites;
 
-import application.Game;
+import application.GameLevel;
 import biuoop.DrawSurface;
 import collidefeatures.CollisionInfo;
 import collidefeatures.Velocity;
@@ -39,7 +39,7 @@ public class Ball implements Sprite {
      *this method add the ball to the game by
      *adding it to the sprit list.
      */
-    public void addToGame(Game g) {
+    public void addToGame(GameLevel g) {
         this.setGameEnvironment(g.getEvniorment());
         if (g.getSpirtes().getSprites() == null) {
             g.getSpirtes().initializeSpiritList();
@@ -226,17 +226,17 @@ public class Ball implements Sprite {
      * @param ballCenter is ball's current location
      */
     public void remainBallInsideTheGui(Point ballCenter) {
-        if (ballCenter.getX() >= Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE) {
-            ballCenter.setX(Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE);
+        if (ballCenter.getX() >= GameLevel.GUI_WIDTH - GameLevel.GUI_BLOCK_EDGE_SIZE) {
+            ballCenter.setX(GameLevel.GUI_WIDTH - GameLevel.GUI_BLOCK_EDGE_SIZE);
         }
-        if (ballCenter.getX() <= Game.GUI_UPPER_LEFT_X + Game.GUI_BLOCK_EDGE_SIZE) {
-            ballCenter.setX(Game.GUI_UPPER_LEFT_X + Game.GUI_BLOCK_EDGE_SIZE);
+        if (ballCenter.getX() <= GameLevel.GUI_UPPER_LEFT_X + GameLevel.GUI_BLOCK_EDGE_SIZE) {
+            ballCenter.setX(GameLevel.GUI_UPPER_LEFT_X + GameLevel.GUI_BLOCK_EDGE_SIZE);
         }
-        if (ballCenter.getY() <= Game.GUI_UPPER_LEFT_Y + Game.GUI_BLOCK_EDGE_SIZE) {
-            ballCenter.setY(Game.GUI_UPPER_LEFT_Y + Game.GUI_BLOCK_EDGE_SIZE);
+        if (ballCenter.getY() <= GameLevel.GUI_UPPER_LEFT_Y + GameLevel.GUI_BLOCK_EDGE_SIZE) {
+            ballCenter.setY(GameLevel.GUI_UPPER_LEFT_Y + GameLevel.GUI_BLOCK_EDGE_SIZE);
         }
-        if (ballCenter.getY() >= Game.GUI_HEIGHT - Game.GUI_BLOCK_EDGE_SIZE) {
-            ballCenter.setY(Game.GUI_HEIGHT - Game.GUI_BLOCK_EDGE_SIZE);
+        if (ballCenter.getY() >= GameLevel.GUI_HEIGHT - GameLevel.GUI_BLOCK_EDGE_SIZE) {
+            ballCenter.setY(GameLevel.GUI_HEIGHT - GameLevel.GUI_BLOCK_EDGE_SIZE);
         }
     }
 
@@ -377,7 +377,7 @@ public class Ball implements Sprite {
      * remove ball from game by remove it from sprite list and
      * remove the block from game enviorment.
      */
-    public void removeFromGame(Game g, Block beingHit) {
+    public void removeFromGame(GameLevel g, Block beingHit) {
         g.removeSprite(this);
         this.removeFromGameEnviorment(beingHit);
     }

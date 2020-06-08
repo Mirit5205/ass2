@@ -1,6 +1,6 @@
 package sprites;
 
-import application.Game;
+import application.GameLevel;
 import biuoop.DrawSurface;
 import biuoop.KeyboardSensor;
 import collidefeatures.CollisionInfo;
@@ -62,7 +62,7 @@ public class Paddle implements Sprite, Collidable {
      */
     public boolean isPaddleCrossRightEdge(Point p) {
         return p.getX() + this.getCollisionRectangle().getWidth()
-                > Game.GUI_WIDTH - Game.GUI_BLOCK_EDGE_SIZE - PADDLE_STEP;
+                > GameLevel.GUI_WIDTH - GameLevel.GUI_BLOCK_EDGE_SIZE - PADDLE_STEP;
     }
     /**
      * checking if the paddle is outside the left edge of the game.
@@ -70,7 +70,7 @@ public class Paddle implements Sprite, Collidable {
      * @return true if it outside the left edge of the game.
      */
     public boolean isPaddleCrossLeftEdge(Point p) {
-        return p.getX() < Game.GUI_UPPER_LEFT_X + Game.GUI_BLOCK_EDGE_SIZE + PADDLE_STEP;
+        return p.getX() < GameLevel.GUI_UPPER_LEFT_X + GameLevel.GUI_BLOCK_EDGE_SIZE + PADDLE_STEP;
     }
     // Sprite
 
@@ -79,10 +79,10 @@ public class Paddle implements Sprite, Collidable {
      * game accordingly.
      */
     public void timePassed() {
-        if (keyboard.isPressed("a") || keyboard.isPressed(KeyboardSensor.LEFT_KEY)) {
+        if (this.keyboard.isPressed("a") || this.keyboard.isPressed(KeyboardSensor.LEFT_KEY)) {
             this.moveLeft();
         }
-        if (keyboard.isPressed("d") || keyboard.isPressed(KeyboardSensor.RIGHT_KEY)) {
+        if (this.keyboard.isPressed("d") || this.keyboard.isPressed(KeyboardSensor.RIGHT_KEY)) {
             this.moveRight();
         }
     }
@@ -109,7 +109,7 @@ public class Paddle implements Sprite, Collidable {
      * Add this paddle to the game.
      * @param g is the game.
      */
-    public void addToGame(Game g) {
+    public void addToGame(GameLevel g) {
         this.keyboard = g.getGui().getKeyboardSensor();
         g.getEvniorment().addCollidable(this);
         g.getSpirtes().addSprite(this);
