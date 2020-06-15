@@ -4,16 +4,19 @@ import biuoop.DrawSurface;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Color;
+import interfaces.Sprite;
 
 /**
  * author hezi yaffe 208424242.
  */
-public class Rectangle {
+public class Rectangle implements Sprite {
     private Point upperLeft;
     private double width;
     private double height;
     private java.awt.Color color;
     private List<Line> edges;
+
+    //constant
     public static final double EPSILON = 0.000000005;
 
 
@@ -31,6 +34,15 @@ public class Rectangle {
         this.height = h;
 
     }
+
+    public Rectangle(Point upperLeftP, double w, double h, Color c) {
+        this.upperLeft = upperLeftP;
+        this.width = w;
+        this.height = h;
+        this.color = c;
+
+    }
+
     /**
      * set rectangle color.
      * @param c the color we want to set.
@@ -77,14 +89,17 @@ public class Rectangle {
         Point p = this.getUpperLeft();
         double h = this.getHeight();
         double w = this.getWidth();
-        surface.setColor(Color.BLACK);
+        surface.setColor(this.color);
         surface.drawRectangle((int) p.getX(), (int) p.getY(),
                 (int) w, (int) h);
-        surface.setColor(this.color);
-        surface.fillRectangle((int) p.getX(), (int) p.getY(),
-                (int) w, (int) h);
+        //surface.setColor(this.color);
+        //surface.fillRectangle((int) p.getX(), (int) p.getY(),
+                //(int) w, (int) h);
     }
 
+    public void timePassed() {
+        ;
+    }
     /**
      * check if there is two equals intersection points using
      * two for loops, if there is any - remove one of them.

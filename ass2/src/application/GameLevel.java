@@ -2,12 +2,12 @@ package application;
 
 import biuoop.GUI;
 import biuoop.DrawSurface;
+import biuoop.KeyboardSensor;
 import collidefeatures.Velocity;
 import gameelements.Counter;
 import gameelements.GameEnvironment;
 import gameelements.SpriteCollection;
 import geometryprimitives.Point;
-import geometryprimitives.Rectangle;
 import interfaces.Collidable;
 import interfaces.LevelInformation;
 import interfaces.Sprite;
@@ -20,6 +20,7 @@ import sprites.Ball;
 import sprites.Block;
 import sprites.Paddle;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,11 +35,13 @@ public class GameLevel implements Animation {
     private boolean running;
     private biuoop.KeyboardSensor keyboard;
     private LevelInformation gameLevel;
+    private List<Sprite> background;
+    private Counter scoresCounter;
+    private int currentLevel;
 
     //private constants.
     private static final int PADDLE_UPPER_LEFT_X = 250;
     private static final int PADDLE_UPPER_LEFT_Y = 500;
-    private static final int NUM_OF_BALLS = 3;
     private static final int BREAK_ALL_BLOCKS_SCORES = 100;
     private static final int FRAMES_PER_SECOND = 60;
     private static final int START_COUNTING_NUMBER = 3;
@@ -56,10 +59,16 @@ public class GameLevel implements Animation {
 
     //constructor
 
-   /* public GameLevel(LevelInformation l) {
+    public GameLevel(LevelInformation l, Counter s, KeyboardSensor k,
+                     AnimationRunner ar, GUI g) {
         this.gameLevel = l;
+        this.scoresCounter = s;
+        this.keyboard = k;
+        this.runner = ar;
+        this.gui = g;
+
     }
-    */
+
     //getters
 
     /**
@@ -83,8 +92,6 @@ public class GameLevel implements Animation {
         return this.sprites;
     }
 
-    //setters
-
     /**
      * update gui filed.
      * @param g is the GUI.
@@ -93,12 +100,13 @@ public class GameLevel implements Animation {
         this.gui = g;
     }
 
+
     /**
      * creating blocks that will be used as game edges.
      * @return array of blocks that located near to the GUI
      * edges.
      */
-    public static Block[] createEdgesArr() {
+    public Block[] createEdgesArr() {
 
         Block[] edges = new Block[4];
         //for the top edge
@@ -110,13 +118,14 @@ public class GameLevel implements Animation {
         //for the right edge
         Point bottomRight2 = new Point(GUI_WIDTH - GUI_BLOCK_EDGE_SIZE, GUI_UPPER_LEFT_Y);
         // the gui edges as blocks
-        edges[0] = new Block(new Rectangle(upperLeft1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
-        edges[1] = new Block(new Rectangle(upperLeft2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
-        edges[2] = new Block(new Rectangle(bottomRight1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
-        edges[3] = new Block(new Rectangle(bottomRight2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
+        edges[0] = new Block(new geometryprimitives.Rectangle(upperLeft1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
+        edges[1] = new Block(new geometryprimitives.Rectangle(upperLeft2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
+        edges[2] = new Block(new geometryprimitives.Rectangle(bottomRight1, GUI_WIDTH, GUI_BLOCK_EDGE_SIZE));
+        edges[3] = new Block(new geometryprimitives.Rectangle(bottomRight2, GUI_BLOCK_EDGE_SIZE, GUI_HEIGHT));
         for (int i = 0; i < edges.length; i++) {
             if (i == 2) {
-                edges[i].setColor(new Color(0, 4, 128));
+                //edges[i].setColor(new Color(0, 4, 128));
+                edges[i].setColor(this.gameLevel.getBackgroundColor());
                 continue;
             }
             edges[i].setColor(Color.GRAY);
@@ -130,7 +139,7 @@ public class GameLevel implements Animation {
      */
     public void addEdgesToGame(GameLevel g) {
         Block[] edges = createEdgesArr();
-        this.counters[1] = new Counter(NUM_OF_BALLS);
+        this.counters[1] = new Counter(this.gameLevel.numberOfBalls());
         BallRemover ballRemover =  new BallRemover(this, this.getRemainingBallsCounter());
         //add edges to the game
         for (int i = 0; i < edges.length; i++) {
@@ -143,73 +152,59 @@ public class GameLevel implements Animation {
     }
 
     /**
-     * @param g is the current game.
      * create a ball set his velocity and add it to game.
      */
-    public void addBallToGame(GameLevel g) {
-        Ball[] ballsArr = new Ball[NUM_OF_BALLS];
-        Velocity[] velocityArr = new Velocity[NUM_OF_BALLS];
-        //random location for the balls (x,y)
-        int[] randomArr = new int[NUM_OF_BALLS * 2];
+    public void addBallToGame() {
+        Ball[] ballsArr = new Ball[this.gameLevel.numberOfBalls()];
+        List<Velocity> ballsVelocities = this.gameLevel.initialBallVelocities();
+        List<Point> ballsCenters = this.gameLevel.arrangeBallsOnTopOfPaddle();
 
-        for (int i = 0; i < randomArr.length - 1; i++) {
-            randomArr[i] = (int) (Math.random() * 100 + 200);
-            randomArr[i + 1] = (int) (Math.random() * 100 + 300);
-        }
-
-        for (int i = 0; i < NUM_OF_BALLS; i++) {
-            ballsArr[i] = new Ball(randomArr[i], randomArr[i + 1], BALL_RADIUS, java.awt.Color.BLACK);
-            velocityArr[i] = Velocity.fromAngleAndSpeed(280, 12);
-            ballsArr[i].setVelocity(velocityArr[i]);
-            ballsArr[i].addToGame(g);
-
+        for (int i = 0; i < this.gameLevel.numberOfBalls(); i++) {
+            ballsArr[i] = new Ball(ballsCenters.get(i), BALL_RADIUS, this.gameLevel.getBallsColor()[i]);
+            ballsArr[i].setVelocity(ballsVelocities.get(i));
+            ballsArr[i].addToGame(this);
         }
     }
 
     /**
-     * @param g is the current game.
      * create a paddle (block) and add it to game.
      */
-    public void addPaddleToGame(GameLevel g) {
-        Paddle paddle = new Paddle(new Block(PADDLE_UPPER_LEFT_X, PADDLE_UPPER_LEFT_Y
-                , PADDLE_WIDTH, PADDLE_HEIGHT), Color.orange);
-        paddle.addToGame(g);
+    public void addPaddleToGame() {
+        //Paddle paddle = new Paddle(new Block(PADDLE_UPPER_LEFT_X, PADDLE_UPPER_LEFT_Y
+                //, this.gameLevel.paddleWidth(), PADDLE_HEIGHT), Color.orange);
+        Paddle paddle = new Paddle(new Block(GUI_WIDTH / 2 - this.gameLevel.paddleWidth() / 2,
+                PADDLE_UPPER_LEFT_Y, this.gameLevel.paddleWidth(), PADDLE_HEIGHT), Color.orange);
+        paddle.addToGame(this);
 
     }
 
     /**
-     * @param g is the current game.
      * add the blocks we get in the instructions to the game.
      */
-    public void addBlocksToGame(GameLevel g) {
+    public void addBlocksToGame() {
         //counting the removeable blocks in the game
-        int counter = 0;
-        //List<Block[]> listOfBlocksArr = Block.createListOfBlocksArr();
-        List<Block[]> listOfBlocksArr = Block.createGameBlocks();
-        for (Block[] b : listOfBlocksArr) {
-            for (int i = 0; i < b.length; i++) {
-                b[i].initializeHitListenersList();
-                b[i].addToGame(g);
-                counter++;
-            }
+        int counter = this.gameLevel.numberOfBlocksToRemove();
+        List<Block> listOfBlocks = this.gameLevel.blocks();
+
+        for (int i = 0; i < listOfBlocks.size(); i++) {
+            listOfBlocks.get(i).initializeHitListenersList();
+            listOfBlocks.get(i).addToGame(this);
+            //counter++;
         }
 
         /* initial blockRemover counter (counters[0]), blockRemover event,
          * ScoreTrackingListener counter (counters[2]), ScoreTrackingListener event.
          */
         this.counters[0] = new Counter(counter);
-        this.counters[2] = new Counter(0);
+        this.counters[2] = this.scoresCounter;
         BlockRemover remover = new BlockRemover(this, this.getRemainingBlocksCounter());
         ScoreTrackingListener score = new ScoreTrackingListener(this.getScoresCounter(),
                 this.getRemainingBlocksCounter());
 
-        //add BlockRemover hit listener to every removable block
-        for (Block[] b : listOfBlocksArr) {
-            for (int i = 0; i < b.length; i++) {
-                b[i].initializeHitListenersList();
-                b[i].addHitListener(remover);
-                b[i].addHitListener(score);
-            }
+        for (int i = 0; i < this.gameLevel.numberOfBlocksToRemove(); i++) {
+            listOfBlocks.get(i).initializeHitListenersList();
+            listOfBlocks.get(i).addHitListener(remover);
+            listOfBlocks.get(i).addHitListener(score);
         }
 
     }
@@ -253,12 +248,13 @@ public class GameLevel implements Animation {
      * game fileds
      */
     public void initializeGameFileds(GameLevel g) {
-        g.setGui(new GUI("Arkanoid", GUI_WIDTH, GUI_HEIGHT));
-        g.runner = new AnimationRunner();
+        //g.setGui(new GUI("Arkanoid", GUI_WIDTH, GUI_HEIGHT));
+        //g.runner = new AnimationRunner();
         g.keyboard = g.getGui().getKeyboardSensor();
         g.setRunner(this.gui, FRAMES_PER_SECOND);
         g.environment = new GameEnvironment();
         g.sprites = new SpriteCollection();
+        g.background = new ArrayList<Sprite>();
     }
 
     public void setRunner(GUI g, int frames) {
@@ -272,63 +268,16 @@ public class GameLevel implements Animation {
     public void initialize() {
         initializeGameCounterArr();
         initializeGameFileds(this);
-        addBallToGame(this);
+        addBallToGame();
         addEdgesToGame(this);
-        addBlocksToGame(this);
-        addPaddleToGame(this);
+        addBlocksToGame();
+        addPaddleToGame();
         addScoreCounterToGame();
     }
 
     /**
      * Run the game -- start the animation loop.
      */
-    /* public void run() {
-        int framesPerSecond = 60;
-        int millisecondsPerFrame = 1000 / framesPerSecond;
-        Sleeper sleeper = new Sleeper();
-         while (true) {
-            long startTime = System.currentTimeMillis(); // timing
-            DrawSurface d =  this.getGui().getDrawSurface();
-            drawGuiBackground(d);
-            this.sprites.drawAllOn(d);
-            this.gui.show(d);
-            this.sprites.notifyAllTimePassed();
-
-            // timing
-            long usedTime = System.currentTimeMillis() - startTime;
-            long milliSecondLeftToSleep = millisecondsPerFrame - usedTime;
-            if (milliSecondLeftToSleep > 0) {
-                sleeper.sleepFor(milliSecondLeftToSleep);
-            }
-
-            //using -1 as a flag in order to get another round of run()
-            if (this.getRemainingBlocksCounter().getValue() == -1) {
-                sleeper.sleepFor(END_GAME_MILLISECONDS);
-                this.getGui().close();
-                return;
-            }
-
-            if (isThereNoBlocksLeft(this.getRemainingBlocksCounter())) {
-                this.getScoresCounter().increase(BREAK_ALL_BLOCKS_SCORES);
-                this.getRemainingBlocksCounter().decrease(1);
-            }
-
-            if (isThereNoBallsLeft(this.getRemainingBallsCounter())) {
-                sleeper.sleepFor(END_GAME_MILLISECONDS);
-                this.getGui().close();
-                return;
-
-            }
-        }
-    }
-     */
-
-    public void runningcountingdown() {
-        this.runner.setFramesPerSecond(1);
-        this.runner.run(new CountdownAnimation(2,
-                START_COUNTING_NUMBER, this.sprites));
-        this.runner.setFramesPerSecond(FRAMES_PER_SECOND);
-    }
     public void run() {
         runningcountingdown();
         this.running = true;
@@ -336,6 +285,18 @@ public class GameLevel implements Animation {
         // the game.
         this.runner.run(this);
     }
+
+    public void runningcountingdown() {
+        this.runner.setFramesPerSecond(1);
+        this.background.add(this.gameLevel.getBackground());
+        this.background.addAll(this.gameLevel.getBackgroundSpirtes());
+        CountdownAnimation animation = new CountdownAnimation(2,
+                START_COUNTING_NUMBER, this.sprites);
+        animation.setBackground(this.background);
+        this.runner.run(animation);
+        this.runner.setFramesPerSecond(FRAMES_PER_SECOND);
+    }
+
 
     /**
      * checking if there is no blocks left in the current game.
@@ -359,10 +320,14 @@ public class GameLevel implements Animation {
      * according the instructions, paint GUI back-ground in dark blue.
      * @param d is the drawing surface.
      */
-    public static void drawGuiBackground(DrawSurface d) {
-         Color c = new Color(0, 4, 128);
-         d.setColor(c);
-        d.fillRectangle(GameLevel.GUI_UPPER_LEFT_X, GameLevel.GUI_UPPER_LEFT_Y, GameLevel.GUI_WIDTH, GameLevel.GUI_HEIGHT);
+    public void drawGuiBackground(DrawSurface d) {
+         Sprite s = this.gameLevel.getBackground();
+        List<Sprite> spritesList = this.gameLevel.getBackgroundSpirtes();
+        s.drawOn(d);
+        for (Sprite sprite : spritesList) {
+            sprite.drawOn(d);
+        }
+
     }
 
     /**
@@ -398,7 +363,8 @@ public class GameLevel implements Animation {
      * @return score indicator.
      */
     public ScoreIndicator initializeScoreIndicator() {
-       return new ScoreIndicator(this.getScoresCounter());
+       //return new ScoreIndicator(this.getScoresCounter());
+        return new ScoreIndicator(this.scoresCounter);
     }
 
     /**
@@ -413,6 +379,10 @@ public class GameLevel implements Animation {
         return !this.running;
     }
 
+    public boolean isWin(int listSize, int currentLevel, GameLevel l) {
+        return listSize == currentLevel && l.getRemainingBlocksCounter().getValue() == -1;
+    }
+
     public void doOneFrame(DrawSurface d) {
         drawGuiBackground(d);
         this.sprites.drawAllOn(d);
@@ -420,9 +390,16 @@ public class GameLevel implements Animation {
         if (this.keyboard.isPressed("p")) {
             this.runner.run(new PauseScreen(this.keyboard));
         }
+
+        if (this.getRemainingBallsCounter().getValue() == 0) {
+            this.runner.run(new EndLooseScreen(this.keyboard, this.scoresCounter));
+            this.running = false;
+            this.gui.close();
+        }
+
         //using -1 as a flag in order to get another round of run()
         if (this.getRemainingBlocksCounter().getValue() == -1) {
-            this.getGui().close();
+            //this.getGui().close();
             this.running = false;
         }
 
@@ -432,7 +409,7 @@ public class GameLevel implements Animation {
         }
 
         if (isThereNoBallsLeft(this.getRemainingBallsCounter())) {
-            this.getGui().close();
+            //this.getGui().close();
             this.running = false;
         }
     }

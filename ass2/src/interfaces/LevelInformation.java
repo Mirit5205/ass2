@@ -1,8 +1,10 @@
 package interfaces;
 
 import collidefeatures.Velocity;
+import geometryprimitives.Point;
 import sprites.Block;
 
+import java.awt.*;
 import java.util.List;
 
 public interface LevelInformation {
@@ -23,4 +25,11 @@ public interface LevelInformation {
     // before the level is considered to be "cleared".
     // This number should be <= blocks.size();
     int numberOfBlocksToRemove();
+    List<Sprite> getBackgroundSpirtes();
+
+    Color getBackgroundColor();
+
+    List<Point> arrangeBallsOnTopOfPaddle();
+
+    Color[] getBallsColor();
 }

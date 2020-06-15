@@ -3,6 +3,9 @@ package application;
 import biuoop.DrawSurface;
 import gameelements.SpriteCollection;
 import interfaces.Animation;
+import interfaces.Sprite;
+
+import java.util.List;
 
 public class CountdownAnimation implements Animation {
     private boolean stop;
@@ -10,6 +13,7 @@ public class CountdownAnimation implements Animation {
     private int startingCount;
     private int currentCountNum;
     private SpriteCollection screen;
+    private List<Sprite> background;
 
     //getters
     public double getSecondsNumber() {
@@ -28,8 +32,14 @@ public class CountdownAnimation implements Animation {
         this.currentCountNum = countFrom;
     }
 
+    //setters
+    public void setBackground(List<Sprite> guiBackground) {
+        this.background = guiBackground;
+    }
     public void doOneFrame(DrawSurface d) {
-        GameLevel.drawGuiBackground(d);
+        for (Sprite s : this.background) {
+            s.drawOn(d);
+        }
         this.screen.drawAllOn(d);
         this.stop = false;
         if (currentCountNum == 0) {

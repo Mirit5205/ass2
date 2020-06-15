@@ -2,7 +2,6 @@ package interfaces;
 
 import collidefeatures.CollisionInfo;
 import collidefeatures.Velocity;
-import geometryprimitives.Rectangle;
 import sprites.Ball;
 
 /**
@@ -12,7 +11,7 @@ public interface Collidable {
     /**
      * @return the "collision shape" of the object.
      */
-    Rectangle getCollisionRectangle();
+    geometryprimitives.Rectangle getCollisionRectangle();
 
     /**
      * Notify the object that we collided with it at collisionPoint with

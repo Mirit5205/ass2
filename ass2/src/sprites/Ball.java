@@ -7,7 +7,6 @@ import collidefeatures.Velocity;
 import gameelements.GameEnvironment;
 import geometryprimitives.Line;
 import geometryprimitives.Point;
-import geometryprimitives.Rectangle;
 import interfaces.Collidable;
 import interfaces.Sprite;
 import java.util.ArrayList;
@@ -279,7 +278,7 @@ public class Ball implements Sprite {
      */
     public boolean isCollide(Line trajectory, Point newCenter, Point collisionPoint) {
         return trajectory.start().distance(collisionPoint)
-                - trajectory.start().distance(newCenter) < Rectangle.EPSILON;
+                - trajectory.start().distance(newCenter) < geometryprimitives.Rectangle.EPSILON;
     }
 
     /**

@@ -92,7 +92,13 @@ public class Paddle implements Sprite, Collidable {
      * @param d is the drawing surface.
      */
     public void drawOn(DrawSurface d) {
+        Point upperLeft = this.getCollisionRectangle().getUpperLeft();
         this.getCollisionRectangle().drawOn(d);
+        d.setColor(this.color);
+        d.fillRectangle((int) upperLeft.getX(), (int)upperLeft.getY(),
+                (int) this.getCollisionRectangle().getWidth(),
+                (int) this.getCollisionRectangle().getHeight());
+
 
     }
 
@@ -101,7 +107,7 @@ public class Paddle implements Sprite, Collidable {
      * get paddle collision rectangle.
      * @return paddle collision rectangle.
      */
-    public Rectangle getCollisionRectangle() {
+    public geometryprimitives.Rectangle getCollisionRectangle() {
         return this.block.getCollisionRectangle();
     }
 

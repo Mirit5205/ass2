@@ -6,7 +6,6 @@ import collidefeatures.CollisionInfo;
 import collidefeatures.Velocity;
 import gameelements.GameEnvironment;
 import geometryprimitives.Point;
-import geometryprimitives.Rectangle;
 import interfaces.Collidable;
 import interfaces.HitListener;
 import interfaces.HitNotifier;
@@ -19,7 +18,7 @@ import java.util.List;
  * author hezi yaffe 208424242.
  */
 public class Block implements Collidable, Sprite, HitNotifier {
-    private Rectangle rectangle;
+    private geometryprimitives.Rectangle rectangle;
     private int hitCounter;
     private static java.awt.Color color;
     private List<HitListener> hitListeners;
@@ -32,7 +31,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
     /**
      * @param r is block rectangle.
      */
-    public Block(Rectangle r) {
+    public Block(geometryprimitives.Rectangle r) {
         this.rectangle = r;
     }
 
@@ -42,7 +41,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @param height is rectangle height.
      */
     public Block(Point upperLeft, double width, double height) {
-        this.rectangle = new Rectangle(upperLeft, width, height);
+        this.rectangle = new geometryprimitives.Rectangle(upperLeft, width, height);
     }
 
     /**
@@ -52,7 +51,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @param height is rectangle height.
      */
     public Block(double x, double y, double width, double height) {
-        this.rectangle = new Rectangle(new Point(x, y), width, height);
+        this.rectangle = new geometryprimitives.Rectangle(new Point(x, y), width, height);
     }
 
     /**
@@ -64,7 +63,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
      * @param hitCounter is block hit counter.
      */
     public Block(double x, double y, double width, double height, int hitCounter) {
-        this.rectangle = new Rectangle(new Point(x, y), width, height);
+        this.rectangle = new geometryprimitives.Rectangle(new Point(x, y), width, height);
         this.hitCounter = hitCounter;
     }
 
@@ -90,7 +89,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
     /**
      * @return the "collision shape" of the object.
      */
-    public Rectangle getCollisionRectangle() {
+    public geometryprimitives.Rectangle getCollisionRectangle() {
         return this.rectangle;
 
     }
@@ -150,7 +149,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
         double dy = currentVelocity.getDy();
         Point collisionPoint = c.getCollisionPoint();
         Collidable collidable = c.getCollisionObject();
-        Rectangle r = collidable.getCollisionRectangle();
+        geometryprimitives.Rectangle r = collidable.getCollisionRectangle();
         r.setRectangleEdgesAsLinesList();
         Velocity newVelocity = currentVelocity;
         //if the x value of the ball center is outside the GUI
@@ -298,7 +297,7 @@ public class Block implements Collidable, Sprite, HitNotifier {
         Block scoreBlock;
         //upper left point of the GUI
         Point upperLeft = new Point(GameLevel.GUI_UPPER_LEFT_X, GameLevel.GUI_UPPER_LEFT_Y);
-        scoreBlock = new Block(new Rectangle(upperLeft, GameLevel.GUI_WIDTH, GameLevel.GUI_BLOCK_EDGE_SIZE + 10));
+        scoreBlock = new Block(new geometryprimitives.Rectangle(upperLeft, GameLevel.GUI_WIDTH, GameLevel.GUI_BLOCK_EDGE_SIZE + 10));
         scoreBlock.setColor(Color.white);
         return scoreBlock;
     }
